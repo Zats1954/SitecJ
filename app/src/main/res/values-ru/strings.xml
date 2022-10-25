@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Ситек</string>
+    <string name="action_settings">Settings</string>
+    <string name="first_fragment_label">Начало</string>
+    <string name="second_fragment_label">Список пользователей</string>
+    <string name="next">Вход</string>
+    <string name="previous">К началу</string>
+    <string name="textview">TextView</string>
+</resources>
