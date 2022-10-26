@@ -9,7 +9,17 @@ import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.security.cert.CertificateException;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +28,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import okhttp3.Credentials;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -33,8 +44,8 @@ import retrofit2.http.Query;
 import ru.zatsoft.sitecj.databinding.ActivityMainBinding;
 
 interface WebServer {
-    @GET("/{imei}/authentication/")
-    Call<Response<String>> authentication(@Path("imei") String imei);
+    @GET("/UKA_TRADE/hs/MobileClient/{imei}/authentication/")
+    Call<MainActivity.Otvet> authentication(@Path("imei") String imei);
 }
 
 public class MainActivity extends AppCompatActivity {
@@ -61,32 +72,41 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("IMEI", IMEINumber);
         editor.apply();
+
+
 //      Соединение с  сервером
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
         // concatenate username and password with colon for authentication
-        String credentials = username + ":" + password;
+        String credentials = Credentials.basic(username ,password);
         // create Base64 encodet string
         final String basic =
-                "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                "basic " + Base64.encode(credentials.getBytes(), Base64.NO_WRAP);
 
-        OkHttpClient.Builder client = new OkHttpClient.Builder()
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder = configureToIgnoreCertificate(builder);
+        OkHttpClient.Builder client = builder
                 .addInterceptor(interceptor)
                 .addInterceptor(new Interceptor() {
                     @Override
                     public okhttp3.Response intercept(Chain chain) throws IOException {
                         Request newRequest  = chain.request().newBuilder()
-                                .addHeader("Authorization", basic)
+                                .header("Authorization",credentials)
                                 .build();
                         return chain.proceed(newRequest);
                     }
                 });
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+
+
 
         Retrofit retrofit =
                 new Retrofit.Builder()
                         .baseUrl(BuildConfig.BASE_URL)
-                        .addConverterFactory(GsonConverterFactory.create())
+                        .addConverterFactory(GsonConverterFactory.create(gson))
                         .client(client.build())
                         .build();
 
@@ -98,24 +118,17 @@ public class MainActivity extends AppCompatActivity {
         String nfc = " ";
 
 //      Авторизация на сервере
-        webServer.authentication(IMEINumber).enqueue(new Callback(){
+        webServer.authentication(IMEINumber).enqueue(new Callback<Otvet>  (){
             @Override
-            public void onResponse(Call call, Response response) {
-                System.out.println(response.body());
+            public void onResponse(Call<Otvet>   call, Response<Otvet>   response) {
+                System.out.println(response.body().Code);
             }
             @Override
-            public void onFailure(Call call, Throwable t) {
-                System.out.println(call.toString());
-                Toast.makeText(getApplicationContext(),t.getMessage(),Toast.LENGTH_LONG).show();
+            public void onFailure(Call<Otvet> call, Throwable t){
+            System.out.println(call.toString());
+            Toast.makeText(getApplicationContext(),t.getMessage(),Toast.LENGTH_LONG).show();}
 
-            }
         });
-
-//        Call<Response<String>> call = webServer.authentication(IMEINumber,
-//                uid,
-//                passw,
-//                copyFromDevice,
-//                nfc);
 //-----------------------------------------------
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -149,5 +162,57 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    private static OkHttpClient.Builder configureToIgnoreCertificate(OkHttpClient.Builder builder) {
+        try {
+            // Create a trust manager that does not validate certificate chains
+            final TrustManager[] trustAllCerts = new TrustManager[] {
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                        }
+
+                        @Override
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                        }
+
+                        @Override
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new java.security.cert.X509Certificate[]{};
+                        }
+                    }
+            };
+
+            // Install the all-trusting trust manager
+            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            // Create an ssl socket factory with our all-trusting manager
+            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
+            builder.hostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+            System.out.println("Exception while configuring IgnoreSslCertificate" + e);
+        }
+        return builder;
+    }
+
+
+    class Otvet{
+        public long getCode() {
+            return Code;
+        }
+
+        public void setCode(long code) {
+            Code = code;
+        }
+
+        private  long Code ;
     }
 }
