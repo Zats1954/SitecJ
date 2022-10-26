@@ -9,17 +9,14 @@ import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.io.IOException;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import javax.security.cert.CertificateException;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,12 +37,19 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
+
+import ru.zatsoft.pojo.ListUser;
+import ru.zatsoft.pojo.Otvet;
+import ru.zatsoft.pojo.UserInf;
+import ru.zatsoft.pojo.Users;
 import ru.zatsoft.sitecj.databinding.ActivityMainBinding;
 
 interface WebServer {
     @GET("/UKA_TRADE/hs/MobileClient/{imei}/authentication/")
-    Call<MainActivity.Otvet> authentication(@Path("imei") String imei);
+    Call<Otvet> authentication(@Path("imei") String imei);
+
+    @GET("/UKA_TRADE/hs/MobileClient/{imei}/form/users/")
+    Call<UserInf> getUsers(@Path("imei") String imei);
 }
 
 public class MainActivity extends AppCompatActivity {
@@ -55,7 +59,10 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 101;
     private final String username = "http";
     private final String password = "http";
-    String IMEINumber;
+    private static String IMEINumber;
+
+    private long myCode;
+    private UserInf listUsers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,45 +104,56 @@ public class MainActivity extends AppCompatActivity {
                         return chain.proceed(newRequest);
                     }
                 });
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-
-
 
         Retrofit retrofit =
                 new Retrofit.Builder()
                         .baseUrl(BuildConfig.BASE_URL)
-                        .addConverterFactory(GsonConverterFactory.create(gson))
+                        .addConverterFactory(GsonConverterFactory.create())
                         .client(client.build())
                         .build();
 
         WebServer webServer = retrofit.create(WebServer.class);
 
-        String uid = "http";
-        String passw = "http";
-        String copyFromDevice = "false";
-        String nfc = " ";
+//        String uid = "http";
+//        String passw = "http";
+//        String copyFromDevice = "false";
+//        String nfc = " ";
 
-//      Авторизация на сервере
+
+//      Получение своего кода на сервере
         webServer.authentication(IMEINumber).enqueue(new Callback<Otvet>  (){
             @Override
             public void onResponse(Call<Otvet>   call, Response<Otvet>   response) {
-                System.out.println(response.body().Code);
+                myCode = response.body().getCode();
+                System.out.println(myCode);
             }
             @Override
             public void onFailure(Call<Otvet> call, Throwable t){
             System.out.println(call.toString());
             Toast.makeText(getApplicationContext(),t.getMessage(),Toast.LENGTH_LONG).show();}
+        });
 
+        webServer.getUsers(IMEINumber).enqueue(new Callback<UserInf>  (){
+            @Override
+            public void onResponse(Call<UserInf>   call, Response<UserInf>   response) {
+                listUsers = response.body();
+                for (ListUser list: listUsers.getUsers().getListUsers()) {
+                    System.out.print(list.getUser()+ "/");
+                    System.out.print(list.getUid()+ "/");
+                    System.out.println(list.getLanguage()+ "/");
+                }
+
+            }
+            @Override
+            public void onFailure(Call<UserInf> call, Throwable t){
+                System.out.println(call.toString());
+                Toast.makeText(getApplicationContext(),t.getMessage(),Toast.LENGTH_LONG).show();}
         });
 //-----------------------------------------------
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         setSupportActionBar(binding.toolbar);
-
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -201,18 +219,5 @@ public class MainActivity extends AppCompatActivity {
             System.out.println("Exception while configuring IgnoreSslCertificate" + e);
         }
         return builder;
-    }
-
-
-    class Otvet{
-        public long getCode() {
-            return Code;
-        }
-
-        public void setCode(long code) {
-            Code = code;
-        }
-
-        private  long Code ;
     }
 }
