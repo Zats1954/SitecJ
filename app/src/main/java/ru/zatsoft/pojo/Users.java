@@ -8,13 +8,13 @@ public class Users {
 
     @SerializedName("ListUsers")
     @Expose
-    private List<ListUser> listUsers = null;
+    private List<User> listUsers = null;
 
-    public List<ListUser> getListUsers() {
+    public List<User> getListUsers() {
         return listUsers;
     }
 
-    public void setListUsers(List<ListUser> listUsers) {
+    public void setListUsers(List<User> listUsers) {
         this.listUsers = listUsers;
     }
 

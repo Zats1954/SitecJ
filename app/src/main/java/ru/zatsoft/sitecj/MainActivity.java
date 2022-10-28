@@ -6,10 +6,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
-import android.util.Base64;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -38,10 +38,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 
-import ru.zatsoft.pojo.ListUser;
+import ru.zatsoft.pojo.User;
 import ru.zatsoft.pojo.Otvet;
 import ru.zatsoft.pojo.UserInf;
-import ru.zatsoft.pojo.Users;
 import ru.zatsoft.sitecj.databinding.ActivityMainBinding;
 
 interface WebServer {
@@ -59,10 +58,11 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 101;
     private final String username = "http";
     private final String password = "http";
-    private static String IMEINumber;
+    protected static String IMEINumber;
 
     private long myCode;
-    private UserInf listUsers;
+    protected static UserInf listInfUsers;
+    public static List<User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,12 +85,7 @@ public class MainActivity extends AppCompatActivity {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
-        // concatenate username and password with colon for authentication
         String credentials = Credentials.basic(username ,password);
-        // create Base64 encodet string
-        final String basic =
-                "basic " + Base64.encode(credentials.getBytes(), Base64.NO_WRAP);
-
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder = configureToIgnoreCertificate(builder);
         OkHttpClient.Builder client = builder
@@ -114,12 +109,6 @@ public class MainActivity extends AppCompatActivity {
 
         WebServer webServer = retrofit.create(WebServer.class);
 
-//        String uid = "http";
-//        String passw = "http";
-//        String copyFromDevice = "false";
-//        String nfc = " ";
-
-
 //      Получение своего кода на сервере
         webServer.authentication(IMEINumber).enqueue(new Callback<Otvet>  (){
             @Override
@@ -136,28 +125,25 @@ public class MainActivity extends AppCompatActivity {
         webServer.getUsers(IMEINumber).enqueue(new Callback<UserInf>  (){
             @Override
             public void onResponse(Call<UserInf>   call, Response<UserInf>   response) {
-                listUsers = response.body();
-                for (ListUser list: listUsers.getUsers().getListUsers()) {
-                    System.out.print(list.getUser()+ "/");
-                    System.out.print(list.getUid()+ "/");
-                    System.out.println(list.getLanguage()+ "/");
-                }
-
+                listInfUsers = response.body();
+                users = listInfUsers.getUsers().getListUsers();
+                goToUI();
             }
             @Override
             public void onFailure(Call<UserInf> call, Throwable t){
                 System.out.println(call.toString());
                 Toast.makeText(getApplicationContext(),t.getMessage(),Toast.LENGTH_LONG).show();}
         });
-//-----------------------------------------------
+    }
 
+    private void goToUI() {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
+        Bundle bundle = new Bundle();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
     }
 
     @Override
@@ -177,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();

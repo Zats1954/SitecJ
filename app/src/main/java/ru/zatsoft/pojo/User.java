@@ -3,11 +3,11 @@ package ru.zatsoft.pojo;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ListUser {
+public class User {
 
    @SerializedName("User")
    @Expose
-   private String user;
+   private String name;
    @SerializedName("Uid")
    @Expose
    private String uid;
@@ -15,12 +15,12 @@ public class ListUser {
    @Expose
    private String language;
 
-   public String getUser() {
-      return user;
+   public String getName() {
+      return name;
    }
 
-   public void setUser(String user) {
-      this.user = user;
+   public void setName(String name) {
+      this.name = name;
    }
 
    public String getUid() {
