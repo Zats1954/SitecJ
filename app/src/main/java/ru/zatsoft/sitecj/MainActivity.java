@@ -37,9 +37,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-
-import ru.zatsoft.pojo.User;
 import ru.zatsoft.pojo.Otvet;
+import ru.zatsoft.pojo.User;
 import ru.zatsoft.pojo.UserInf;
 import ru.zatsoft.sitecj.databinding.ActivityMainBinding;
 
@@ -85,19 +84,16 @@ public class MainActivity extends AppCompatActivity {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
-        String credentials = Credentials.basic(username ,password);
+        String credentials = Credentials.basic(username, password);
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder = configureToIgnoreCertificate(builder);
         OkHttpClient.Builder client = builder
                 .addInterceptor(interceptor)
-                .addInterceptor(new Interceptor() {
-                    @Override
-                    public okhttp3.Response intercept(Chain chain) throws IOException {
-                        Request newRequest  = chain.request().newBuilder()
-                                .header("Authorization",credentials)
-                                .build();
-                        return chain.proceed(newRequest);
-                    }
+                .addInterceptor(chain -> {
+                    Request newRequest = chain.request().newBuilder()
+                            .header("Authorization", credentials)
+                            .build();
+                    return chain.proceed(newRequest);
                 });
 
         Retrofit retrofit =
@@ -110,29 +106,34 @@ public class MainActivity extends AppCompatActivity {
         WebServer webServer = retrofit.create(WebServer.class);
 
 //      Получение своего кода на сервере
-        webServer.authentication(IMEINumber).enqueue(new Callback<Otvet>  (){
+        webServer.authentication(IMEINumber).enqueue(new Callback<Otvet>() {
             @Override
-            public void onResponse(Call<Otvet>   call, Response<Otvet>   response) {
+            public void onResponse(Call<Otvet> call, Response<Otvet> response) {
                 myCode = response.body().getCode();
                 System.out.println(myCode);
             }
+
             @Override
-            public void onFailure(Call<Otvet> call, Throwable t){
-            System.out.println(call.toString());
-            Toast.makeText(getApplicationContext(),t.getMessage(),Toast.LENGTH_LONG).show();}
+            public void onFailure(Call<Otvet> call, Throwable t) {
+                System.out.println(call);
+                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
         });
 
-        webServer.getUsers(IMEINumber).enqueue(new Callback<UserInf>  (){
+        webServer.getUsers(IMEINumber).enqueue(new Callback<UserInf>() {
             @Override
-            public void onResponse(Call<UserInf>   call, Response<UserInf>   response) {
+            public void onResponse(Call<UserInf> call, Response<UserInf> response) {
                 listInfUsers = response.body();
                 users = listInfUsers.getUsers().getListUsers();
                 goToUI();
+
             }
+
             @Override
-            public void onFailure(Call<UserInf> call, Throwable t){
-                System.out.println(call.toString());
-                Toast.makeText(getApplicationContext(),t.getMessage(),Toast.LENGTH_LONG).show();}
+            public void onFailure(Call<UserInf> call, Throwable t) {
+                System.out.println(call);
+                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+            }
         });
     }
 
@@ -147,16 +148,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_CODE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Permission granted.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "Permission denied.", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission granted.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Permission denied.", Toast.LENGTH_SHORT).show();
+                finish();
             }
         }
     }
@@ -172,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
     private static OkHttpClient.Builder configureToIgnoreCertificate(OkHttpClient.Builder builder) {
         try {
             // Create a trust manager that does not validate certificate chains
-            final TrustManager[] trustAllCerts = new TrustManager[] {
+            final TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
                         @Override
                         public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
@@ -195,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
             // Create an ssl socket factory with our all-trusting manager
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
-            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
+            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
             builder.hostnameVerifier(new HostnameVerifier() {
                 @Override
                 public boolean verify(String hostname, SSLSession session) {

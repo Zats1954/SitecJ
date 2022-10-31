@@ -1,7 +1,6 @@
 package ru.zatsoft.sitecj;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import ru.zatsoft.sitecj.databinding.FragmentSecondBinding;
 
-public class SecondFragment extends  Fragment {
+public class SecondFragment extends Fragment {
 
     private FragmentSecondBinding binding;
 
@@ -31,11 +30,14 @@ public class SecondFragment extends  Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ArrayList<String> users = getArguments().getStringArrayList ("listUsers");
+        ArrayList<String> users = null;
+        if (getArguments() != null) {
+            users = getArguments().getStringArrayList("listUsers");
+        }
 
-        String[] lll =new String[] {"nnn","jjj","iii"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,
-               users);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,
+                users);
 
         binding.listUsers.setAdapter(adapter);
 
