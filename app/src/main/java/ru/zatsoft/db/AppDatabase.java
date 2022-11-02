@@ -6,7 +6,7 @@ import ru.zatsoft.dao.UserDao;
 import ru.zatsoft.entity.UserEntity;
 
 
-@Database(entities = {UserEntity.class}, version = 1)
+@Database(entities = {UserEntity.class}, version = 1, exportSchema =false)
 //@TypeConverters({UserConvertor.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DB_NAME = "sitecDb";

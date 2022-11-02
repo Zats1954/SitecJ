@@ -8,8 +8,6 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "users")
 public class UserEntity implements Serializable {
-    public UserEntity() {
-    }
 
     public UserEntity(String name, String uid, String language) {
         this.name = name;

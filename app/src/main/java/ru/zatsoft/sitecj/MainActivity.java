@@ -7,8 +7,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
-
-import java.io.IOException;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
@@ -21,12 +19,12 @@ import javax.net.ssl.X509TrustManager;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import okhttp3.Credentials;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -41,6 +39,9 @@ import ru.zatsoft.pojo.Otvet;
 import ru.zatsoft.pojo.User;
 import ru.zatsoft.pojo.UserInf;
 import ru.zatsoft.sitecj.databinding.ActivityMainBinding;
+import ru.zatsoft.viewmodel.MyViewModel;
+
+
 
 interface WebServer {
     @GET("/UKA_TRADE/hs/MobileClient/{imei}/authentication/")
@@ -50,7 +51,7 @@ interface WebServer {
     Call<UserInf> getUsers(@Path("imei") String imei);
 }
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
@@ -58,20 +59,26 @@ public class MainActivity extends AppCompatActivity {
     private final String username = "http";
     private final String password = "http";
     protected static String IMEINumber;
+    protected TelephonyManager telephonyManager;
 
     private long myCode;
     protected static UserInf listInfUsers;
     public static List<User> users;
 
+    MyViewModel myViewModel = new ViewModelProvider(
+            this,
+            ViewModelProvider.Factory.from(MyViewModel.initializer)
+    ).get(MyViewModel.class);
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //       Получаем IMEI телефона
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE);
-            return;
-        }
+        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+         while(
+                 extracted()
+         ) ;
         IMEINumber = telephonyManager.getDeviceId();
 //        и сохраняем IMEI
         SharedPreferences sharedPref = getSharedPreferences("PREF", Context.MODE_PRIVATE);
@@ -137,6 +144,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private boolean extracted() {
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE);
+            System.out.println("REQUEST CODE" + REQUEST_CODE);
+            return true;
+        }
+        return false;
+    }
+
     private void goToUI() {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -146,13 +162,14 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
     }
-
+//    ActivityCompat.OnRequestPermissionsResultCallback
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission granted.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, this.getString(R.string.permission), Toast.LENGTH_SHORT).show();
+               return;
             } else {
                 Toast.makeText(this, "Permission denied.", Toast.LENGTH_SHORT).show();
                 finish();
