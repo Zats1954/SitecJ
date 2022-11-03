@@ -1,14 +1,12 @@
 package ru.zatsoft.dao;
 
 import java.util.List;
-
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import ru.zatsoft.entity.UserEntity;
-
 
 @Dao
 public interface UserDao {

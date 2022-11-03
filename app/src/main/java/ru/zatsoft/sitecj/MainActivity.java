@@ -1,14 +1,16 @@
 package ru.zatsoft.sitecj;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
@@ -26,7 +28,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import okhttp3.Credentials;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private final String username = "http";
     private final String password = "http";
     protected static String IMEINumber;
+    private TelephonyManager telephonyManager;
 
     private long myCode;
     protected static UserInf listInfUsers;
@@ -65,20 +67,32 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (getIntent().hasExtra("bundle") && savedInstanceState == null) {
+            savedInstanceState = getIntent().getExtras().getBundle("bundle");
+        }
+
         super.onCreate(savedInstanceState);
-//       Получаем IMEI телефона
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE);
+//       Перезагрузка после получения разрешений
+            Intent mStartActivity = new Intent(MainActivity.this, MainActivity.class);
+            int mPendingIntentId = 123456;
+            PendingIntent mPendingIntent = PendingIntent.getActivity(MainActivity.this, mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+            AlarmManager mgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
+            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 10, mPendingIntent);
+            System.exit(0);
             return;
         }
+
+//       Получаем IMEI телефона
+        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         IMEINumber = telephonyManager.getDeviceId();
 //        и сохраняем IMEI
         SharedPreferences sharedPref = getSharedPreferences("PREF", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("IMEI", IMEINumber);
         editor.apply();
-
 
 //      Соединение с  сервером
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -102,31 +116,31 @@ public class MainActivity extends AppCompatActivity {
                         .addConverterFactory(GsonConverterFactory.create())
                         .client(client.build())
                         .build();
-
         WebServer webServer = retrofit.create(WebServer.class);
 
 //      Получение своего кода на сервере
         webServer.authentication(IMEINumber).enqueue(new Callback<Otvet>() {
             @Override
-            public void onResponse(Call<Otvet> call, Response<Otvet> response) {
+            public void onResponse(@NonNull Call<Otvet> call, @NonNull Response<Otvet> response) {
+                assert response.body() != null;
                 myCode = response.body().getCode();
-                System.out.println(myCode);
+                System.out.println("My application code " + myCode);
             }
 
             @Override
-            public void onFailure(Call<Otvet> call, Throwable t) {
+            public void onFailure(@NonNull Call<Otvet> call, @NonNull Throwable t) {
                 System.out.println(call);
                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
 
+//      Получение списка из сервера
         webServer.getUsers(IMEINumber).enqueue(new Callback<UserInf>() {
             @Override
             public void onResponse(Call<UserInf> call, Response<UserInf> response) {
                 listInfUsers = response.body();
                 users = listInfUsers.getUsers().getListUsers();
                 goToUI();
-
             }
 
             @Override
@@ -136,12 +150,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+//---------------------------------------------------------------------------------------
+
 
     private void goToUI() {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
-        Bundle bundle = new Bundle();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -153,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Permission granted.", Toast.LENGTH_SHORT).show();
+
             } else {
                 Toast.makeText(this, "Permission denied.", Toast.LENGTH_SHORT).show();
                 finish();
@@ -160,14 +176,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
-    }
-
+    //   Обход проверки сертификата SSL
     private static OkHttpClient.Builder configureToIgnoreCertificate(OkHttpClient.Builder builder) {
         try {
             // Create a trust manager that does not validate certificate chains
@@ -206,4 +215,14 @@ public class MainActivity extends AppCompatActivity {
         }
         return builder;
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        return NavigationUI.navigateUp(navController, appBarConfiguration)
+                || super.onSupportNavigateUp();
+    }
+
+
 }

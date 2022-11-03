@@ -10,7 +10,6 @@ public class UserConvertor {
 
     @TypeConverter
     public static UserEntity toUserEntity(User user) {
-
         return new UserEntity(user.getName(), user.getUid(), user.getLanguage());
     }
 

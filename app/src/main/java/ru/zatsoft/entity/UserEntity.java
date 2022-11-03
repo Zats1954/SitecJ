@@ -1,7 +1,6 @@
 package ru.zatsoft.entity;
 
 import java.io.Serializable;
-
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -60,6 +59,4 @@ public class UserEntity implements Serializable {
     public void setLanguage(String language) {
         this.language = language;
     }
-
-
 }

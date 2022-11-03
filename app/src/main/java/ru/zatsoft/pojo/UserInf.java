@@ -5,16 +5,16 @@ import com.google.gson.annotations.SerializedName;
 
 public class UserInf {
 
-   @SerializedName("Users")
-   @Expose
-   private Users users;
+    @SerializedName("Users")
+    @Expose
+    private Users users;
 
-   public Users getUsers() {
-      return users;
-   }
+    public Users getUsers() {
+        return users;
+    }
 
-   public void setUsers(Users users) {
-      this.users = users;
-   }
+    public void setUsers(Users users) {
+        this.users = users;
+    }
 
 }
