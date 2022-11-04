@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 //       Перезагрузка после получения разрешений
             Intent mStartActivity = new Intent(MainActivity.this, MainActivity.class);
             int mPendingIntentId = 123456;
-            PendingIntent mPendingIntent = PendingIntent.getActivity(MainActivity.this, mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent mPendingIntent = PendingIntent.getActivity(MainActivity.this, mPendingIntentId, mStartActivity, PendingIntent.FLAG_IMMUTABLE);
             AlarmManager mgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
             mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 10, mPendingIntent);
             System.exit(0);

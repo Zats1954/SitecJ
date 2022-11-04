@@ -60,6 +60,7 @@ public class FirstFragment extends Fragment {
         writedB.start();
 
         Bundle bundle = new Bundle();
+//        bundle.putParcelable("newUsers", users);
         bundle.putStringArrayList("listUsers", listU);
         binding.buttonFirst.setOnClickListener(view1 -> NavHostFragment.findNavController(FirstFragment.this)
                 .navigate(R.id.action_FirstFragment_to_SecondFragment, bundle));
