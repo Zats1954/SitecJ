@@ -5,38 +5,36 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import java.util.List;
-
 import androidx.recyclerview.widget.RecyclerView;
 import ru.zatsoft.pojo.User;
-import ru.zatsoft.sitecj.databinding.FragmentSecondBinding;
 import ru.zatsoft.sitecj.databinding.RecyclerviewRowBinding;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
-    private List<String> itemList;
+    private List<User> itemList;
     private LayoutInflater myInflater;
     private ItemClickListener myClickListener;
     private RecyclerviewRowBinding binding;
-    private ViewGroup container;
 
 
-    public UserAdapter(Context context, List<String> users) {
+    public UserAdapter(Context context, List<User> users) {
         this.myInflater = LayoutInflater.from(context);
         this.itemList = users;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        binding = RecyclerviewRowBinding.inflate(myInflater, container, false);
+        binding = RecyclerviewRowBinding.inflate(myInflater, parent, false);
         return new ViewHolder(binding.getRoot());
     }
 
+
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String user = itemList.get(position);
-        holder.myTextView.setText(user);
+        User user = itemList.get(position);
+        holder.myTextView.setText(user.getName());
+        holder.myUID.setText(user.getUid());
     }
 
     @Override
@@ -48,18 +46,18 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         this.myClickListener = itemClickListener;
     }
 
-    public String getItem(int position) {
+    public User getItem(int position) {
         return itemList.get(position);
     }
 
-
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView myTextView;
+        TextView myUID;
 
         ViewHolder(View itemView) {
             super(itemView);
             myTextView = binding.tvName;
-            myTextView.setText("itemView.");
+            myUID = binding.tvUID;
             itemView.setOnClickListener(this);
         }
 

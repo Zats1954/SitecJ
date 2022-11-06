@@ -10,11 +10,11 @@ public class UserEntity implements Serializable {
     public UserEntity() {
     }
 
-    public UserEntity(String name, String uid, String language) {
-        this.name = name;
-        this.uid = uid;
-        this.language = language;
-    }
+//    public UserEntity(String name, String uid, String language) {
+//        this.name = name;
+//        this.uid = uid;
+//        this.language = language;
+//    }
 
     @PrimaryKey(autoGenerate = true)
     public int id;

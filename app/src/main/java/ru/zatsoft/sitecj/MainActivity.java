@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private final String password = "http";
     protected static String IMEINumber;
     private TelephonyManager telephonyManager;
+    public static Context context;
 
     private long myCode;
     protected static UserInf listInfUsers;
@@ -72,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
+
+        context = getBaseContext();
 
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE);

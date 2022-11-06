@@ -6,15 +6,19 @@ import ru.zatsoft.pojo.User;
 
 
 public class UserConvertor {
-    private static User user = new User();
 
     @TypeConverter
     public static UserEntity toUserEntity(User user) {
-        return new UserEntity(user.getName(), user.getUid(), user.getLanguage());
+        UserEntity userEntity = new UserEntity();
+        userEntity.name = user.getName();
+        userEntity.uid = user.getUid();
+        userEntity.language = user.getLanguage();
+        return userEntity;
     }
 
     @TypeConverter
-    public User toUser(UserEntity userEntity) {
+    public static User toUser(UserEntity userEntity) {
+        User user = new User();
         user.setName(userEntity.name);
         user.setUid(userEntity.uid);
         user.setLanguage(userEntity.language);

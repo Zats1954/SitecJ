@@ -4,5 +4,6 @@
     <string name="second_fragment_label">Список пользователей</string>
     <string name="next">Вход</string>
     <string name="previous">К началу</string>
-    <string name="textview">TextView</string>
+    <string name="name">Должность</string>
+    <string name="code">Код</string>
 </resources>
