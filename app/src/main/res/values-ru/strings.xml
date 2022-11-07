@@ -6,4 +6,5 @@
     <string name="previous">К началу</string>
     <string name="name">Должность</string>
     <string name="code">Код</string>
+    <string name="Click"> Вы выбрали </string>
 </resources>

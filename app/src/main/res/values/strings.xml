@@ -7,4 +7,5 @@
     <string name="previous">Previous</string>
     <string name="name">Job title</string>
     <string name="code">Code</string>
+    <string name="Click">"You clicked "</string>
 </resources>
