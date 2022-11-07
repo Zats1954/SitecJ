@@ -1,10 +1,10 @@
-name: CI WORK
+name: CI RECYCLEVIEW
 
 on:
   push:
-    branches: [ work ]
+    branches: [ recycleview ]
   pull_request:
-    branches: [ work ]
+    branches: [recycleview ]
 
 jobs:
   build:
