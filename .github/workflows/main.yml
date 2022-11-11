@@ -1,10 +1,10 @@
-name: CI RECYCLEVIEW
+name: CI MVVM
 
 on:
   push:
-    branches: [ recycleview ]
+    branches: [ mvvm ]
   pull_request:
-    branches: [recycleview ]
+    branches: [mvvm ]
 
 jobs:
   build:
