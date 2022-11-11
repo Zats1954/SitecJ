@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/FirstFragment"
         android:name="ru.zatsoft.sitecj.FirstFragment"
-        android:label="@string/first_fragment_label"
+        android:label="@string/beginning"
         tools:layout="@layout/fragment_first">
 
         <action
@@ -18,11 +18,24 @@
     <fragment
         android:id="@+id/SecondFragment"
         android:name="ru.zatsoft.sitecj.SecondFragment"
-        android:label="@string/second_fragment_label"
+        android:label="@string/list_users"
         tools:layout="@layout/fragment_second">
 
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
+        <action
+            android:id="@+id/action_SecondFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+
     </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="ru.zatsoft.sitecj.LoginFragment"
+        android:label="@string/authorization" >
+        <action
+            android:id="@+id/action_loginFragment_to_FirstFragment"
+            app:destination="@id/FirstFragment" />
+    </fragment>
+
 </navigation>

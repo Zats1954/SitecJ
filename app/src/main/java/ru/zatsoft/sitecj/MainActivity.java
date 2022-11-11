@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private long myCode;
     protected static UserInf listInfUsers;
     public static List<User> users;
+    public static WebServer webServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                         .addConverterFactory(GsonConverterFactory.create())
                         .client(client.build())
                         .build();
-        WebServer webServer = retrofit.create(WebServer.class);
+        webServer = retrofit.create(WebServer.class);
 
 //      Получение своего кода на сервере
         webServer.authentication(IMEINumber).enqueue(new Callback<Otvet>() {

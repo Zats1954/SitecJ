@@ -8,4 +8,9 @@
     <string name="name">Job title</string>
     <string name="code">Code</string>
     <string name="Click">"You clicked "</string>
+    <string name="login_label">login</string>
+    <string name="password">password</string>
+    <string name="authorization">Authorization</string>
+    <string name="list_users">List users</string>
+    <string name="beginning">Beginning</string>
 </resources>

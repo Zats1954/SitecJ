@@ -7,4 +7,9 @@
     <string name="name">Должность</string>
     <string name="code">Код</string>
     <string name="Click"> Вы выбрали </string>
+    <string name="login_label">login</string>
+    <string name="password">пароль</string>
+    <string name="authorization">Авторизация</string>
+    <string name="list_users">Список пользователей</string>
+    <string name="beginning">Начало</string>
 </resources>

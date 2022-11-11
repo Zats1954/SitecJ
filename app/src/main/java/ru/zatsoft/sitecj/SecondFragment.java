@@ -53,5 +53,9 @@ public class SecondFragment extends Fragment implements UserAdapter.ItemClickLis
     public void onItemClick(View view, int position) {
         Toast.makeText(requireContext(), getString(R.string.Click) + getString(R.string.name) + radapter.getItem(position).getName() + "\n"
                 + getString(R.string.code) + radapter.getItem(position).getUid(), Toast.LENGTH_SHORT).show();
+        Bundle bundle = new Bundle();
+        bundle.putString("name",radapter.getItem(position).getName());
+        NavHostFragment.findNavController(SecondFragment.this)
+                .navigate(R.id.action_SecondFragment_to_loginFragment, bundle);
     }
 }
