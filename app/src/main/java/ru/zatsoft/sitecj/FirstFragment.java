@@ -7,15 +7,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
-import ru.zatsoft.UserDB;
 import ru.zatsoft.sitecj.databinding.FragmentFirstBinding;
-
-import static ru.zatsoft.sitecj.MainActivity.users;
 
 public class FirstFragment extends Fragment {
     private FragmentFirstBinding binding;
@@ -37,10 +33,6 @@ public class FirstFragment extends Fragment {
 
         imei = sharedPref.getString("IMEI", " ");
         binding.textView.setText(imei);
-
-        Thread fillDB = new DbThread();
-        fillDB.start();
-
         binding.buttonFirst.setOnClickListener(view1 -> NavHostFragment.findNavController(FirstFragment.this)
                 .navigate(R.id.action_FirstFragment_to_SecondFragment));
     }
@@ -58,12 +50,3 @@ public class FirstFragment extends Fragment {
     }
 }
 
-class DbThread extends Thread {
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    @Override
-    public void run() {
-        super.run();
-        UserDB userDB = new UserDB();
-        users = userDB.getAll();
-    }
-}
