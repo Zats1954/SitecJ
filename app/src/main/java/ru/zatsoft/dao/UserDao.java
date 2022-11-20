@@ -13,9 +13,6 @@ public interface UserDao {
     @Query("SELECT * FROM users")
     List<UserEntity> getAll();
 
-    @Query("SELECT * FROM users")
-    List<UserEntity> loadAll();
-
     @Query("SELECT * FROM users WHERE name LIKE :name LIMIT 1")
     UserEntity findByName(String name);
 
