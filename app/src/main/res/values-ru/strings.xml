@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Ситек</string>
+    <string name="first_fragment_label">Начало</string>
+    <string name="second_fragment_label">Список пользователей</string>
+    <string name="next">Вход</string>
+    <string name="previous">К началу</string>
+    <string name="name">Должность</string>
+    <string name="code">Код</string>
+    <string name="Click"> Вы выбрали </string>
+    <string name="login_label">login</string>
+    <string name="password">пароль</string>
+    <string name="authorization">Авторизация</string>
+    <string name="list_users">Список пользователей</string>
+    <string name="beginning">Начало</string>
+    <string name="Authorization_failed">Авторизация не прошла</string>
+</resources>

@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">SitecJ</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">Beginning</string>
+    <string name="second_fragment_label">List users</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="name">Job title</string>
+    <string name="code">Code</string>
+    <string name="Click">"You clicked "</string>
+    <string name="login_label">login</string>
+    <string name="password">password</string>
+    <string name="authorization">Authorization</string>
+    <string name="list_users">List users</string>
+    <string name="beginning">Beginning</string>
+    <string name="Authorization_failed">Authorization failed</string>
+</resources>
