@@ -1,14 +1,16 @@
 package ru.zatsoft.sitecj;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import ru.zatsoft.repository.RepositoryImp;
 import ru.zatsoft.sitecj.databinding.FragmentLoginBinding;
 
 public class LoginFragment extends Fragment {
@@ -27,15 +29,11 @@ public class LoginFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         String nameUser = getArguments().getString("name");
         binding.tvName.setText(nameUser);
-        binding.btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(requireContext(), getString(R.string.Click) + " " +
-                                getString(R.string.authorization) + "\n" +
-                                getString(R.string.login_label) + " " + nameUser + "\n"
-                                + getString(R.string.password) + " " + binding.etPassword.getText(),
-                        Toast.LENGTH_LONG).show();
-            }
+        binding.btnLogin.setOnClickListener(v -> {
+            String password = binding.etPassword.getText().toString();
+            SharedPreferences sharedPref = getContext().getSharedPreferences("PREF", Context.MODE_PRIVATE);
+            RepositoryImp newAuth = new RepositoryImp(nameUser, password);
+            newAuth.authent(sharedPref.getString("IMEI"," "));
         });
     }
 }

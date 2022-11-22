@@ -10,13 +10,14 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.widget.Toast;
+
 import java.util.List;
-import javax.net.ssl.HostnameVerifier;
+
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private final String password = "http";
     protected static String IMEINumber;
     private TelephonyManager telephonyManager;
-    public  static Context context;
+    public static Context context;
     private RepositoryImp repository;
     public static List<User> users;
 
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
     }
 
-//  Запрос разрешений Internet
+    //  Запрос разрешений Internet
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-// Обход проверки сертификата SSL
+    // Обход проверки сертификата SSL
     private static OkHttpClient.Builder configureToIgnoreCertificate(OkHttpClient.Builder builder) {
         try {
             // Create a trust manager that does not validate certificate chains
@@ -150,14 +151,3 @@ public class MainActivity extends AppCompatActivity {
         context = null;
     }
 }
-
-//class DbThread extends Thread {
-//    @RequiresApi(api = Build.VERSION_CODES.N)
-//    @Override
-//    public void run() {
-//        super.run();
-//        UserDB userDB = new UserDB();
-//        users = userDB.getAll();
-//        for(User user: users){System.out.println(user.getName());}
-//    }
-//}

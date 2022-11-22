@@ -30,6 +30,8 @@ import ru.zatsoft.pojo.Otvet;
 import ru.zatsoft.pojo.User;
 import ru.zatsoft.pojo.UserInf;
 import ru.zatsoft.sitecj.BuildConfig;
+import ru.zatsoft.sitecj.R;
+
 import static ru.zatsoft.sitecj.MainActivity.context;
 import static ru.zatsoft.sitecj.MainActivity.users;
 
@@ -77,14 +79,18 @@ public class RepositoryImp {
         webServer.authentication(IMEINumber).enqueue(new Callback<Otvet>() {
             @Override
             public void onResponse(@NonNull Call<Otvet> call, @NonNull Response<Otvet> response) {
+                if(response.code() == 401){
+                  Toast.makeText(context, R.string.Authorization_failed, Toast.LENGTH_SHORT).show();
+                } else{
                 assert response.body() != null;
-                getCode(response);
+                getCode(response);}
             }
 
             @Override
             public void onFailure(@NonNull Call<Otvet> call, @NonNull Throwable t) {
                 System.out.println(t.getMessage());
                 Toast.makeText(context, t.getMessage(), Toast.LENGTH_LONG).show();
+                myCode = 0L;
             }
         });
         return myCode;

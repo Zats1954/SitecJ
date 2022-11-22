@@ -12,4 +12,5 @@
     <string name="authorization">Авторизация</string>
     <string name="list_users">Список пользователей</string>
     <string name="beginning">Начало</string>
+    <string name="Authorization_failed">Авторизация не прошла</string>
 </resources>
